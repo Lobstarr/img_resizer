@@ -8,6 +8,8 @@ resize_size = 1280
 tmb_flag = True
 tmb_size = 300
 filenames_arr = []
+remote_filepath = ""
+
 
 def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size):
     im = Image.open(os.path.join(img_src_path, img_name))
@@ -27,7 +29,7 @@ def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size)
 
 
 inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
-#inputpath = os.path.join(os.getcwd(), "original_img")
+# inputpath = os.path.join(os.getcwd(), "original_img")
 outputpath = os.path.join(os.getcwd(), "output_img")
 
 for dirpath, dirnames, filenames in os.walk(inputpath):
@@ -73,20 +75,28 @@ for dirpath, dirnames, filenames in os.walk(inputpath):
             else:
                 out_filename = file
 
-            out_filenames.append(out_filename)
+            out_filenames.append([out_filename, artikul])
             if resize_flag:
                 resize_tmb_img(file, dirpath, out_path, out_filename, resize_size)
             else:
-                #print("copying" + os.path.join(dirpath, file) + " to " + os.path.join(out_path, out_filename))
+                # print("copying" + os.path.join(dirpath, file) + " to " + os.path.join(out_path, out_filename))
                 copyfile(os.path.join(dirpath, file), os.path.join(out_path, out_filename))
         filenames_arr.append(out_filenames)
 
-f = open("filenames.txt", "w+")
+try:
+    path_file = open("path.txt", "r")
+    lines = path_file.readlines()
+    remote_filepath = lines[0].strip()
+except IOError:
+    print("Error: Couldn't open file!.")
+    remote_filepath = ""
 
+
+f = open("filenames.txt", "w+")
 for art in filenames_arr:
     out_str = ""
     for file in art:
-        out_str += file + ";"
+        out_str += remote_filepath + file[1] + "/" + file[0] + ";"
     f.write(out_str + "\n")
 f.close()
 print('DONE!')
