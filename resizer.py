@@ -4,10 +4,10 @@ from shutil import copyfile
 
 rename_flag = True
 resize_flag = True
-resize_size = 1200
+resize_size = 1280
 tmb_flag = True
 tmb_size = 300
-
+filenames_arr = []
 
 def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size):
     im = Image.open(os.path.join(img_src_path, img_name))
@@ -27,10 +27,8 @@ def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size)
 
 
 inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
-# inputpath = os.path.join(os.getcwd(), "original_img")
+#inputpath = os.path.join(os.getcwd(), "original_img")
 outputpath = os.path.join(os.getcwd(), "output_img")
-# print(inputpath)
-# pprint(list(os.walk(inputpath)))
 
 for dirpath, dirnames, filenames in os.walk(inputpath):
     out_path = os.path.join(outputpath, os.path.relpath(dirpath, inputpath))
@@ -64,6 +62,7 @@ for dirpath, dirnames, filenames in os.walk(inputpath):
         # print("artikul: " + os.path.relpath(dirpath, inputpath))
 
         counter = 0
+        out_filenames = []
         for file in filenames:
             # print('in dir ' + os.path.relpath(dirpath, inputpath) + " there are file " + file)
 
@@ -74,10 +73,20 @@ for dirpath, dirnames, filenames in os.walk(inputpath):
             else:
                 out_filename = file
 
+            out_filenames.append(out_filename)
             if resize_flag:
                 resize_tmb_img(file, dirpath, out_path, out_filename, resize_size)
             else:
                 #print("copying" + os.path.join(dirpath, file) + " to " + os.path.join(out_path, out_filename))
                 copyfile(os.path.join(dirpath, file), os.path.join(out_path, out_filename))
+        filenames_arr.append(out_filenames)
 
+f = open("filenames.txt", "w+")
+
+for art in filenames_arr:
+    out_str = ""
+    for file in art:
+        out_str += file + ";"
+    f.write(out_str + "\n")
+f.close()
 print('DONE!')
