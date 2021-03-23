@@ -1,9 +1,9 @@
 import os
 from PIL import Image
-from pprint import pprint
+from shutil import copyfile
 
 rename_flag = True
-resize_flag = False
+resize_flag = True
 resize_size = 1200
 tmb_flag = True
 tmb_size = 300
@@ -34,49 +34,50 @@ outputpath = os.path.join(os.getcwd(), "output_img")
 
 for dirpath, dirnames, filenames in os.walk(inputpath):
     out_path = os.path.join(outputpath, os.path.relpath(dirpath, inputpath))
-    print(out_path)
+
     if not os.path.isdir(out_path):
         os.mkdir(out_path)
         print('Processing ' + dirpath)
     else:
         print(dirpath + " Folder does already exits!")
-        #True
-
-    # print("list ")
-    # path_list = list(os.path.split(dirpath))
-    # print(dirpath)
-    # print(list(path_list))
+        # True
 
     if dirpath == inputpath:
         # nothing to do in root
         True
         # print("root")
-    elif str(os.path.relpath(dirpath, inputpath)).find('//'):
+    elif "\\" in os.path.relpath(dirpath, inputpath):
         # if subdir
-        print("skipping subdir " + os.path.relpath(dirpath, inputpath))
+        print("skipping subdir " + str(os.path.relpath(dirpath, inputpath)))
     else:
         # if not subdir
         artikul = os.path.relpath(dirpath, inputpath)
 
+        # remove everything except jpg
+        for file in filenames:
+            if not file.endswith('.jpg'):
+                filenames.remove(file)
+
+        # generate thumbnails
         if tmb_flag:
             resize_tmb_img(filenames[0], dirpath, out_path, artikul + "_tmb" + ".jpg", tmb_size)
         # print("artikul: " + os.path.relpath(dirpath, inputpath))
 
-        counter = 1
+        counter = 0
         for file in filenames:
             # print('in dir ' + os.path.relpath(dirpath, inputpath) + " there are file " + file)
-            if file.endswith('.jpg'):
-                if rename_flag:
-                    resize_tmb_img(file, dirpath, out_path, file, resize_size)
-                    True
-                else:
-                    resize_tmb_img(file, dirpath, out_path, artikul + ".jpg", resize_size)
-                    True
 
+            counter += 1
 
+            if rename_flag:
+                out_filename = artikul + "_" + str(counter) + ".jpg"
+            else:
+                out_filename = file
 
-        True
+            if resize_flag:
+                resize_tmb_img(file, dirpath, out_path, out_filename, resize_size)
+            else:
+                #print("copying" + os.path.join(dirpath, file) + " to " + os.path.join(out_path, out_filename))
+                copyfile(os.path.join(dirpath, file), os.path.join(out_path, out_filename))
 
-
-            #print(dirpath)
 print('DONE!')
