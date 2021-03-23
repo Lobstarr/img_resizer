@@ -4,8 +4,10 @@ from pprint import pprint
 
 rename_flag = True
 resize_flag = False
+resize_size = 1200
 tmb_flag = True
 tmb_size = 300
+
 
 def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size):
     im = Image.open(os.path.join(img_src_path, img_name))
@@ -37,37 +39,44 @@ for dirpath, dirnames, filenames in os.walk(inputpath):
         os.mkdir(out_path)
         print('Processing ' + dirpath)
     else:
-        #print(dirpath + " Folder does already exits!")
-        True
+        print(dirpath + " Folder does already exits!")
+        #True
 
     # print("list ")
-    path_list = list(os.path.split(dirpath))
-    #print(dirpath)
-    #print(list(path_list))
+    # path_list = list(os.path.split(dirpath))
+    # print(dirpath)
+    # print(list(path_list))
 
     if dirpath == inputpath:
+        # nothing to do in root
         True
         # print("root")
+    elif str(os.path.relpath(dirpath, inputpath)).find('//'):
+        # if subdir
+        print("skipping subdir " + os.path.relpath(dirpath, inputpath))
     else:
+        # if not subdir
         artikul = os.path.relpath(dirpath, inputpath)
-        resize_tmb_img(filenames[0], dirpath, out_path, artikul + "_tmb" + ".jpg", 1200)
-        #print("artikul: " + os.path.relpath(dirpath, inputpath))
-    True
+
+        if tmb_flag:
+            resize_tmb_img(filenames[0], dirpath, out_path, artikul + "_tmb" + ".jpg", tmb_size)
+        # print("artikul: " + os.path.relpath(dirpath, inputpath))
+
+        counter = 1
+        for file in filenames:
+            # print('in dir ' + os.path.relpath(dirpath, inputpath) + " there are file " + file)
+            if file.endswith('.jpg'):
+                if rename_flag:
+                    resize_tmb_img(file, dirpath, out_path, file, resize_size)
+                    True
+                else:
+                    resize_tmb_img(file, dirpath, out_path, artikul + ".jpg", resize_size)
+                    True
 
 
-    if tmb_flag:
+
         True
 
-    counter = 1
-    for file in filenames:
-        # print('in dir ' + os.path.relpath(dirpath, inputpath) + " there are file " + file)
-        if file.endswith('.jpg'):
 
-            if rename_flag:
-                #resize_tmb_img(file, dirpath, structure, 1200)
-                True
-            else:
-                #resize_tmb_img(file, dirpath, structure, 1200)
-                True
             #print(dirpath)
 print('DONE!')
