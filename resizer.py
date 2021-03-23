@@ -7,8 +7,15 @@ resize_flag = True
 resize_size = 1280
 tmb_flag = True
 tmb_size = 300
+url_flag = True
 filenames_arr = []
 remote_filepath = ""
+
+def prepare_for_url(text):
+    text = text.lower()
+    text = text.replace("/", "-")
+    text = text.replace(" ", "-")
+    return text
 
 
 def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size):
@@ -32,15 +39,10 @@ inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
 # inputpath = os.path.join(os.getcwd(), "original_img")
 outputpath = os.path.join(os.getcwd(), "output_img")
 
-for dirpath, dirnames, filenames in os.walk(inputpath):
-    out_path = os.path.join(outputpath, os.path.relpath(dirpath, inputpath))
+if not os.path.isdir(outputpath):
+    os.mkdir(outputpath)
 
-    if not os.path.isdir(out_path):
-        os.mkdir(out_path)
-        print('Processing ' + dirpath)
-    else:
-        print(dirpath + " Folder does already exits!")
-        # True
+for dirpath, dirnames, filenames in os.walk(inputpath):
 
     if dirpath == inputpath:
         # nothing to do in root
@@ -52,6 +54,23 @@ for dirpath, dirnames, filenames in os.walk(inputpath):
     else:
         # if not subdir
         artikul = os.path.relpath(dirpath, inputpath)
+
+        if rename_flag:
+            if url_flag:
+                out_path = os.path.join(outputpath, prepare_for_url(artikul))
+            else:
+                out_path = os.path.join(outputpath, artikul)
+        else:
+            if url_flag:
+                out_path = os.path.join(outputpath, prepare_for_url(prepare_for_url(artikul)))
+            else:
+                out_path = os.path.join(outputpath, os.path.relpath(dirpath, inputpath))
+
+        if not os.path.isdir(out_path):
+            os.mkdir(out_path)
+            print('Processing ' + dirpath)
+        else:
+            print(dirpath + " Folder does already exits!")
 
         # remove everything except jpg
         for file in filenames:
@@ -68,12 +87,17 @@ for dirpath, dirnames, filenames in os.walk(inputpath):
         for file in filenames:
             # print('in dir ' + os.path.relpath(dirpath, inputpath) + " there are file " + file)
 
+
+
             counter += 1
 
             if rename_flag:
                 out_filename = artikul + "_" + str(counter) + ".jpg"
             else:
                 out_filename = file
+
+            if url_flag:
+                out_filename = prepare_for_url(out_filename)
 
             out_filenames.append([out_filename, artikul])
             if resize_flag:
