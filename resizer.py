@@ -13,7 +13,8 @@ remote_filepath = ""
 
 def prepare_for_url(text):
     text = text.lower()
-    text = text.replace("/", "-")
+    text = text.replace("/", "-")  # slashes are not allowed in windows filenames
+    text = text.replace("%", "-")  # use percent instead of slashes
     text = text.replace(" ", "-")
     return text
 
@@ -35,8 +36,8 @@ def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size)
     new_im.save(os.path.join(img_dst_path, img_dst_name), "JPEG")
 
 
-inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
-# inputpath = os.path.join(os.getcwd(), "original_img")
+# inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
+inputpath = os.path.join(os.getcwd(), "original_img")
 outputpath = os.path.join(os.getcwd(), "output_img")
 
 if not os.path.isdir(outputpath):
