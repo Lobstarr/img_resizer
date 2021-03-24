@@ -7,7 +7,7 @@ resize_flag = True
 resize_size = 1280
 tmb_flag = True
 tmb_size = 300
-url_flag = True
+url_flag = False
 filenames_arr = []
 remote_filepath = ""
 
@@ -54,18 +54,12 @@ for dirpath, dirnames, filenames in os.walk(inputpath):
         print("skipping subdir " + str(os.path.relpath(dirpath, inputpath)))
     else:
         # if not subdir
-        artikul = os.path.relpath(dirpath, inputpath)
-
-        if rename_flag:
-            if url_flag:
-                out_path = os.path.join(outputpath, prepare_for_url(artikul))
-            else:
-                out_path = os.path.join(outputpath, artikul)
+        if url_flag:
+            artikul = prepare_for_url(os.path.relpath(dirpath, inputpath))
         else:
-            if url_flag:
-                out_path = os.path.join(outputpath, prepare_for_url(prepare_for_url(artikul)))
-            else:
-                out_path = os.path.join(outputpath, os.path.relpath(dirpath, inputpath))
+            artikul = os.path.relpath(dirpath, inputpath)
+
+        out_path = os.path.join(outputpath, artikul)
 
         if not os.path.isdir(out_path):
             os.mkdir(out_path)
