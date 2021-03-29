@@ -3,7 +3,7 @@ from PIL import Image
 from shutil import copyfile
 
 rename_flag = True
-resize_flag = True
+resize_flag = False
 resize_size = 1280
 tmb_flag = True
 tmb_size = 300
@@ -39,6 +39,9 @@ def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size)
 # inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
 inputpath = os.path.join(os.getcwd(), "original_img")
 outputpath = os.path.join(os.getcwd(), "output_img")
+
+if not os.path.isdir(inputpath):
+    os.mkdir(inputpath)
 
 if not os.path.isdir(outputpath):
     os.mkdir(outputpath)
