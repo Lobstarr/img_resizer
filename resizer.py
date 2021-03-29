@@ -6,12 +6,10 @@ import configparser
 filenames_arr = []
 
 
-
 def prepare_for_url(text):
     text = text.lower()
-    text = text.replace("/", "-")  # slashes are not allowed in windows filenames
-    text = text.replace("%", "-")  # use percent instead of slashes
-    text = text.replace(" ", "-")
+    for symbol in url_replace:
+        text = text.replace(symbol, "-")
     return text
 
 
@@ -90,13 +88,19 @@ def do_the_job():
                     copyfile(os.path.join(dirpath, file), os.path.join(out_path, out_filename))
             filenames_arr.append(out_filenames)
 
-    f = open("filenames.txt", "w+")
-    for art in filenames_arr:
-        out_str = ""
-        for file in art:
-            out_str += remote_filepath + file[1] + "/" + file[0] + ";"
-        f.write(out_str + "\n")
-    f.close()
+    if url_flag:
+        f = open("filenames.txt", "w+")
+        for art in filenames_arr:
+            out_str = ""
+            for file in art:
+                out_str += remote_filepath + file[1] + "/" + file[0] + ";"
+            f.write(out_str + "\n")
+        f.close()
+    else:
+        if os.path.exists("filenames.txt"):
+            os.remove("filenames.txt")
+
+
 
 # inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
 inputpath = os.path.join(os.getcwd(), "original_img")
@@ -118,6 +122,8 @@ tmb_flag = config["global_settings"].getboolean("tmb_flag")
 tmb_size = config["global_settings"].getint("tmb_size")
 url_flag = config["global_settings"].getboolean("url_flag")
 remote_filepath = config["paths"]["loftit_path"]
+url_replace = config["global_settings"]["url_replace"]
+url_replace = url_replace.split(",")
 
 do_the_job()
 
