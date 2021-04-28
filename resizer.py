@@ -56,7 +56,7 @@ def do_the_job():
                 print(dirpath + " Folder does already exits!")
 
             # remove everything except jpg
-            for file in filenames:
+            for file in filenames[::-1]:
                 if not file.endswith('.jpg'):
                     filenames.remove(file)
 
