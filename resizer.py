@@ -73,7 +73,7 @@ def do_the_job():
                 counter += 1
 
                 if rename_flag:
-                    out_filename = artikul + "_" + str(counter) + ".jpg"
+                    out_filename = artikul + "_" + str(counter).zfill(3) + ".jpg"
                 else:
                     out_filename = file
 
