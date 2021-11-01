@@ -3,6 +3,8 @@ from PIL import Image
 from shutil import copyfile
 import configparser
 
+# pyinstaller --onefile resizer.py --distpath resizer
+
 filenames_arr = []
 
 
@@ -89,17 +91,15 @@ def do_the_job():
             filenames_arr.append(out_filenames)
 
     if url_flag:
-        f = open("filenames.txt", "w+")
-        for art in filenames_arr:
-            out_str = ""
-            for file in art:
-                out_str += remote_filepath + file[1] + "/" + file[0] + ";"
-            f.write(out_str + "\n")
-        f.close()
+        with open("filenames.txt", 'w') as f:
+            for art in filenames_arr:
+                out_str = ""
+                for file in art:
+                    out_str += remote_filepath + file[1] + "/" + file[0] + ";"
+                f.write(out_str + "\n")
     else:
         if os.path.exists("filenames.txt"):
             os.remove("filenames.txt")
-
 
 
 # inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
@@ -111,7 +111,6 @@ if not os.path.isdir(inputpath):
 
 if not os.path.isdir(outputpath):
     os.mkdir(outputpath)
-
 config = configparser.ConfigParser()  # создаём объекта парсера
 config.read("resizer_config.ini")  # читаем конфиг
 
