@@ -6,8 +6,6 @@ import configparser
 # pyinstaller --onefile resizer.py --distpath resizer
 
 
-
-
 def prepare_for_url(text):
     text = text.lower()
     for symbol in url_replace:
@@ -60,7 +58,7 @@ def do_the_job():
 
             # remove everything except jpg
             for file in filenames[::-1]:
-                if not file.endswith('.jpg'):
+                if not file.lower().endswith('.jpg'):
                     filenames.remove(file)
 
             # generate thumbnails
@@ -102,6 +100,7 @@ def do_the_job():
         if os.path.exists("filenames.txt"):
             os.remove("filenames.txt")
 
+
 if __name__ == '__main__':
 
     filenames_arr = []
@@ -130,3 +129,4 @@ if __name__ == '__main__':
     do_the_job()
 
     print('DONE!')
+    input('Press Enter to exit...')
