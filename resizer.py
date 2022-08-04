@@ -1,4 +1,6 @@
 import os
+
+import PIL
 from PIL import Image
 from shutil import copyfile
 import configparser
@@ -14,7 +16,13 @@ def prepare_for_url(text):
 
 
 def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size):
-    im = Image.open(os.path.join(img_src_path, img_name)).convert('RGB')
+
+    try:
+        im = Image.open(os.path.join(img_src_path, img_name)).convert('RGB')
+    except PIL.UnidentifiedImageError:
+        print('Format of', img_name, 'at', img_src_path, 'is not jpg!')
+        return False
+
     out_size = (out_size, out_size)
     im.thumbnail(out_size)
     img_size = im.size
@@ -30,8 +38,11 @@ def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size)
     # new_im.save(os.path.join(img_dst_path, img_dst_name), "JPEG")
     new_im.save(os.path.join(img_dst_path, img_dst_name), "JPEG", subsampling=0)
 
+    return True
+
 
 def do_the_job():
+    errors_arr = []
     for dirpath, dirnames, filenames in os.walk(inputpath):
 
         if dirpath == inputpath:
@@ -55,6 +66,7 @@ def do_the_job():
                 print('Processing ' + dirpath)
             else:
                 print(dirpath + " Folder does already exits!")
+                continue
 
             # remove everything except jpg
             for file in filenames[::-1]:
@@ -63,7 +75,9 @@ def do_the_job():
 
             # generate thumbnails
             if tmb_flag:
-                resize_tmb_img(filenames[0], dirpath, out_path, artikul + "_tmb" + ".jpg", tmb_size)
+                if not resize_tmb_img(filenames[0], dirpath, out_path, artikul + "_tmb" + ".jpg", tmb_size):
+                    errors_arr.append((dirpath, filenames[0]))
+                    continue
             # print("artikul: " + os.path.relpath(dirpath, inputpath))
 
             counter = 0
@@ -83,11 +97,16 @@ def do_the_job():
 
                 out_filenames.append([out_filename, artikul])
                 if resize_flag:
-                    resize_tmb_img(file, dirpath, out_path, out_filename, resize_size)
+                    if not resize_tmb_img(file, dirpath, out_path, out_filename, resize_size):
+                        errors_arr.append((dirpath, file))
+                        continue
                 else:
                     # print("copying" + os.path.join(dirpath, file) + " to " + os.path.join(out_path, out_filename))
                     copyfile(os.path.join(dirpath, file), os.path.join(out_path, out_filename))
             filenames_arr.append(out_filenames)
+    if errors_arr:
+        print('These files were not processed due to resize error:')
+        print(errors_arr)
 
     if url_flag:
         with open("filenames.txt", 'w') as f:
@@ -104,7 +123,6 @@ def do_the_job():
 if __name__ == '__main__':
 
     filenames_arr = []
-    # inputpath = 'C:\\Users\\krabs\\Desktop\\Matisse\\original_img'
     inputpath = os.path.join(os.getcwd(), "original_img")
     outputpath = os.path.join(os.getcwd(), "output_img")
 
