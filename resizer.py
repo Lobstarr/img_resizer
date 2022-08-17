@@ -15,6 +15,7 @@ def gen_config():
                     'url_flag = False\n'
                     'url_replace = +, ,/,%%\n'
                     'regenerate = True\n'
+                    'list_files_flag = False\n'
                     '\n'
                     '[img_settings]\n'
                     'resize_flag = True\n'
@@ -41,6 +42,9 @@ def resize_tmb_img(img_name, img_src_path, img_dst_path, img_dst_name, out_size,
         im = Image.open(os.path.join(img_src_path, img_name)).convert('RGB')
     except PIL.UnidentifiedImageError:
         print('Format of', img_name, 'at', img_src_path, 'is not jpg!')
+        return False
+    except:
+        print('Something wrong with', img_name, 'at', img_src_path)
         return False
 
     im.thumbnail(out_size)
@@ -132,6 +136,10 @@ def do_the_job():
             else:
                 # print("copying" + os.path.join(dirpath, file) + " to " + os.path.join(out_path, out_filename))
                 copyfile(os.path.join(dirpath, file), os.path.join(out_path, out_filename))
+
+            if list_files_flag:
+                print('File', file, 'at', dirpath, 'is done.')
+
         filenames_arr.append(out_filenames)
     if errors_arr:
         print('These files were not processed due to resize error:')
@@ -171,6 +179,7 @@ if __name__ == '__main__':
     url_replace = config["global_settings"]["url_replace"]
     url_replace = url_replace.split(",")
     regenerate = config["global_settings"].getboolean("regenerate")
+    list_files_flag = config["global_settings"].getboolean("list_files_flag")
 
     resize_flag = config["img_settings"].getboolean("resize_flag")
     center_flag = config["img_settings"].getboolean("center_flag")
