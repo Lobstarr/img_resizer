@@ -123,8 +123,18 @@ class ImagesFolder:
         else:
             self.errors_arr.append('No src file for tmb in ' + str(self.src_folder_path))
 
-    def get_process_report(self):
+    def get_process_report_by_dir(self):
         return [self.src_folder_name, self.dst_folder_name, *self.dst_photo_links_arr]
+
+    def get_process_report_by_file(self):
+        files_arr = []
+        for i in range(len(self.src_photo_names_arr)):
+            files_arr.append([
+                self.src_photo_names_arr[i],
+                self.dst_photo_names_arr[i],
+                self.dst_photo_links_arr[i]
+                 ])
+        return files_arr
 
 
 def gen_config():
@@ -135,6 +145,9 @@ def gen_config():
                     'url_replace = +, ,/,%%\n'
                     'regenerate = True\n'
                     'list_files_flag = False\n'
+                    '# set True to activate file-based output (old-filename, new-filename, path)\n'
+                    '# when True deactivates tmb flag\n'
+                    'separate_files = True\n'
                     '\n'
                     '[img_settings]\n'
                     'resize_flag = True\n'
@@ -212,7 +225,12 @@ def do_the_job():
             continue
         this_dir_obj.generate_output_files()
 
-        ws.append(this_dir_obj.get_process_report())
+        if separate_files:
+            for file in this_dir_obj.get_process_report_by_file():
+                ws.append(file)
+        else:
+            ws.append(this_dir_obj.get_process_report_by_dir())
+
         errors_arr = [*errors_arr, *this_dir_obj.errors_arr]
 
     wb.save('Resizer_output.xlsx')
@@ -248,6 +266,7 @@ if __name__ == '__main__':
     url_replace = url_replace.split(",")
     ImagesFolder.regenerate_files = config["global_settings"].getboolean("regenerate")
     ImagesFolder.print_current_file = config["global_settings"].getboolean("list_files_flag")
+    separate_files = config["global_settings"].getboolean("separate_files")
 
     ImagesFolder.resize_images = config["img_settings"].getboolean("resize_flag")
     ImagesFolder.center_when_upscaling = config["img_settings"].getboolean("center_flag")
@@ -260,6 +279,9 @@ if __name__ == '__main__':
     ImagesFolder.tmb_size = (tmb_size, tmb_size)
 
     ImagesFolder.link_path = config["paths"]["site_path"]
+
+    if separate_files:
+        ImagesFolder.tmb_flag = False
 
     do_the_job()
 
