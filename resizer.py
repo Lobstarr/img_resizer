@@ -3,7 +3,7 @@ from PIL import Image, UnidentifiedImageError
 from shutil import copyfile
 import configparser
 from openpyxl import Workbook
-from openpyxl.worksheet.dimensions import DimensionHolder, ColumnDimension
+from datetime import datetime
 
 
 # pyinstaller --onefile resizer.py --distpath resizer
@@ -158,7 +158,8 @@ def gen_config():
                     'tmb_size = 300\n'
                     '\n'
                     '[paths]\n'
-                    'site_path = loft-it.ru/docs/_shop/loft_it/')
+                    'site_path = loft-it.ru/docs/_shop/loft_it/\n'
+                    'paths_output_file_format = resizer_output_%%d-%%m-%%Y_%%H-%%M-%%S')
         f.write(conf_str)
 
 
@@ -233,7 +234,9 @@ def do_the_job():
 
         errors_arr = [*errors_arr, *this_dir_obj.errors_arr]
 
-    wb.save('Resizer_output.xlsx')
+    datetime_now = datetime.now()
+    paths_output_file = datetime_now.strftime(paths_output_file_format) + '.xlsx'
+    wb.save(paths_output_file)
 
     if errors_arr:
         print('These files were not processed due to resize error:')
@@ -279,6 +282,7 @@ if __name__ == '__main__':
     ImagesFolder.tmb_size = (tmb_size, tmb_size)
 
     ImagesFolder.link_path = config["paths"]["site_path"]
+    paths_output_file_format = config["paths"]["paths_output_file_format"]
 
     if separate_files:
         ImagesFolder.tmb_flag = False
@@ -286,4 +290,4 @@ if __name__ == '__main__':
     do_the_job()
 
     print('DONE!')
-    # input('Press Enter to exit...')
+    input('Press Enter to exit...')
